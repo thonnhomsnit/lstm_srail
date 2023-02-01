@@ -13,8 +13,7 @@ plt.plot(ks['Disp'],ks['Force'])
 plt.xlabel('Disp', fontsize=18)
 plt.ylabel('Force', fontsize=18)
 plt.show()
-#%%
-# Normalize Data
+#%% Normalize Data
 df = ks
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 def scale_data(df):
@@ -65,7 +64,8 @@ model.summary()
 # Compile the model
 model.compile(optimizer='Adam', loss='mean_squared_error',metrics=['accuracy'])
 #Train the model
-history = model.fit(X_data, Y_data, batch_size=199, verbose=1, epochs=50) #validation_split=0.1,
+history = model.fit(X_data, Y_data, batch_size=64, verbose=1, epochs=50)
+model.save('lstm_81.h5')
 #%%
 # test model
 result = model.evaluate(X_data, Y_data)
@@ -76,20 +76,24 @@ print("Test MSE accuracy: ", result[1])
 test_scaled = scaler.fit_transform(ks)
 test_scaled
 test_df = ks
-
+#%% executable with unseen data
 time_step = 2
-test_constant = test_scaled[0][:4]  #first 4 columns (TR A L T)
-test_constant = np.array([list(test_constant)] * time_step)
+test_constant = [-1, -1, -1, -1] #test_scaled[0][:4]  #first 4 columns (TR A L T)
+test_constant = np.array([test_constant] * time_step)
 print("constant: ", test_constant)
-N = test_df.index.size - time_step
+N = 398 #test_df.index.size - time_step
 print("N predict: ", N)
 #%%
 # get first time step data
-test_data = test_scaled[:time_step, -2:]
-test_data
+test_data = [-1, -1]
+test_data = np.array([test_data] * time_step)
+#test_data = test_scaled[:time_step, -2:]
+#test_data
 #%%
 pred_result = test_data.tolist()
 pred_result
+
+#model = tf.keras.models.load_model('lstm_81.h5')
 #%%
 # loop to predict all data
 for i in range(N):
@@ -104,16 +108,8 @@ for i in range(N):
 pred_result = np.array(pred_result)
 pred_result.shape
 #%%
+model.save('lstm_81.h5')
+#%%
 pred_df = pd.DataFrame(data=pred_result)
 pred_df.head()
-pred_df[[0]].plot()
-#%%
-import csv
-with open('data.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerows(pred_result)
-    #%%
-    plt.plot(pred_result)
-    plt.show()
-    #%%
-    model.save('lstm_81.h5')
+plt.plot(pred_df[1],pred_df[0],linewidth = 0.8, color = 'red')
