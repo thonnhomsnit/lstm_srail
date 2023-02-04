@@ -61,11 +61,18 @@ model.add(Dense(Y_data.shape[1], activation="linear"))
 
 model.summary()
 #%%
+import keras.backend as K
+
+def clear_session():
+    K.clear_session()
+
+clear_session()
+#%%
 # Compile the model
-model.compile(optimizer='Adam', loss='mean_squared_error',metrics=['accuracy'])
+model.compile(optimizer='adam', loss='mean_squared_error',metrics=['accuracy'])
 #Train the model
 history = model.fit(X_data, Y_data, batch_size=64, verbose=1, epochs=50)
-model.save('lstm_81.h5')
+#model.save('lstm_81.h5')
 #%%
 # test model
 result = model.evaluate(X_data, Y_data)

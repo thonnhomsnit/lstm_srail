@@ -1,5 +1,5 @@
 clc;
-norm_x = [-1 -1 -1 -1; -1 1 -1 1; 0 1 1 0]; % mock input from NSGAII function
+norm_x = [-1 -1 -1 -1; -1 -1 -1 1; -1 -1 -1 -1]; % mock input from NSGAII function
 num = height(norm_x);
 for i = 1:num
     disp(i+1);
@@ -13,7 +13,7 @@ function [EA] = lstm(input)
 csvwrite('matlabinput.csv', input);
 
 % run the executable file
-system('C:\Users\Personal\Documents\GitHub\lstm_srail\dist\lstm\lstm.exe');
+system('C:\Users\Personal\Documents\GitHub\lstm_srail\dist\testmatlab\testmatlab.exe');
 
 answer = csvread('pythonoutput.csv');
 % prepare for Area calculation
