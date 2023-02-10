@@ -1,12 +1,18 @@
 clc;
-norm_x = [-1 -1 -1 -1; -1 -1 -1 1; -1 -1 -1 -1]; % mock input from NSGAII function
-num = height(norm_x);
-for i = 1:num
-    disp(i+1);
-    input = [0 0 0 0; norm_x(i,:)]; % send this input to lstm function
-    EA = lstm(input);
-    EAcollect(i)=EA;
-end
+input = [0 0 0 0; 1 2 3 4]; % mock input
+
+csvwrite('matlabinput.csv', input);
+
+system('C:\Users\Personal\Documents\GitHub\lstm_srail\dist\testmatlab\testmatlab.exe');
+
+answer = csvread('pythonoutput.csv');
+
+%for i = 1
+%     disp(i+1);
+%     input = [0 0 0 0; norm_x(i,:)]; % send this input to lstm function
+%     EA = lstm(input);
+%     EAcollect(i)=EA;
+%end
 
 function [EA] = lstm(input)
 

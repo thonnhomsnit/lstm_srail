@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-data = pd.read_excel(r'C:/Users/Personal/Documents/GitHub/lstm_srail/data_for_training.xlsx')
+data = pd.read_excel(r'C:/Users/Personal/Documents/GitHub/lstm_srail/data_for_training.xlsx', sheet_name='data_for_training')
 data = data.values
+data = data[:,:7]
 #%% normalize data
 # minmax method at each column
 norm_TR = (data[:32400,0]-np.amin(data[:32400,0]))/(np.amax(data[:32400,0])-np.amin(data[:32400,0]));
@@ -12,8 +16,9 @@ norm_T = (data[:32400,3]-np.amin(data[:32400,3]))/(np.amax(data[:32400,3])-np.am
 
 norm_force = (data[:32400,4]-np.amin(data[:32400,4]))/(np.amax(data[:32400,4])-np.amin(data[:32400,4]));
 norm_disp  = (data[:32400,5]-np.amin(data[:32400,5]))/(np.amax(data[:32400,5])-np.amin(data[:32400,5]));
+norm_time  = (data[:32400,6]-np.amin(data[:32400,6]))/(np.amax(data[:32400,6])-np.amin(data[:32400,6]));
 # concatenate each normalized column
-norm_data = np.column_stack((norm_TR,norm_A,norm_L,norm_T,norm_force,norm_disp))
+norm_data = np.column_stack((norm_TR,norm_A,norm_L,norm_T,norm_force,norm_time))
 #%% normalize in a cool way
 zeros = np.zeros((32400))
 col_ind = list(range(0,6))
@@ -34,22 +39,23 @@ def setup_data(norm_data, time_step = 2):
   Y = np.array(Y)
   return X, Y
 
-X_data, Y_data = setup_data(norm_data)  
+X_data, Y_data = setup_data(norm_data)
 #%% delete data from overlap window
 row_step = np.arange(398,32318,399, dtype=int)
 Y_data = np.delete(Y_data,row_step,axis=0)
 X_data = np.delete(X_data,row_step,axis=0)
 #%% LSTM configuration
 from keras.models import Sequential
-from keras.layers import LSTM, Dense
+from keras.layers import LSTM, Dense, Flatten
 
 # Define the model
 model = Sequential()
-model.add(LSTM(units=50, activation='relu', return_sequences=True, input_shape=(2, 6)))
-model.add(LSTM(units=25, activation="relu"))
-model.add(Dense(units=25))
-model.add(Dense(units=4))
-model.add(Dense(units=2, activation='relu'))
+model.add(LSTM(50, activation="relu", return_sequences=True, use_bias=True, input_shape=(X_data.shape[1], X_data.shape[2])))
+model.add(LSTM(25, activation="relu"))
+model.add(Flatten())
+model.add(Dense(25))
+model.add(Dense(2))
+model.add(Dense(Y_data.shape[1], activation="relu"))
 
 # Compile the model
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
@@ -58,14 +64,16 @@ model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
 # Train the model
-model.fit(X_data, Y_data, epochs=100, verbose=1, batch_size=32)
+model.fit(X_data, Y_data, epochs=100, verbose=1, batch_size=64)
+#%%
+model.save('lstm_test.h5')
 #%%
 result = model.evaluate(X_data, Y_data)
 print("Test MSE loss: ", result)
 #%% executable with unseen data
 time_step = 2
 
-test_constant = [0, 0, 0, 1] #test_scaled[0][:4]  #first 4 columns (TR A L T)
+test_constant = [0.899999999999999999, 0.7, 0.3, 0.5] #test_scaled[0][:4]  #first 4 columns (TR A L T)
 test_constant = np.array([test_constant] * time_step)
 print("constant: ", test_constant)
 
@@ -73,8 +81,8 @@ N = 398 #test_df.index.size - time_step
 print("N predict: ", N)
 
 # get first time step data
-test_data = [0, 0]
-test_data = np.array([test_data] * time_step)
+test_data = [[0, 0],[0, 0]]
+test_data = np.array([test_data])
 print("test data: ", test_data)
 
 pred_result = test_data.tolist()
@@ -90,7 +98,9 @@ for i in range(N):
   pred_result.append(pred.tolist())
 
 pred_result = np.array(pred_result)
-
+#%%
+import matplotlib.pyplot as plt
+#%%
 pred_df = pd.DataFrame(data=pred_result)
 pred_df.head()
 plt.plot(pred_df[0],linewidth = 0.8, color = 'red')
@@ -103,4 +113,4 @@ plt.plot(pred_df[1],pred_df[0],linewidth = 0.8, color = 'red')
 plt.plot(pred_df[0],linewidth = 0.8, color = 'red')
 plt.plot(pred_df[1],linewidth = 0.8, color = 'blue')
 #%%
-model.save('lstm_SP.h5')
+model.save('lstm_all_relu.h5')
