@@ -22,7 +22,7 @@ for i in range(1,10):
     plt.show()
 #%% cell3
 import tensorflow as tf
-model = tf.keras.models.load_model('lstm_test.h5')
+model = tf.keras.models.load_model('lstm_force_time_relu.h5')
 #%% cell4 
 config = pd.read_excel(r'testing_data.xlsx', sheet_name='81config')
 config = config.iloc[:4,:81]
@@ -99,7 +99,7 @@ for i in range(81):
     #plt.plot(disptest[i],forcetest[i])
     #plt.xlim([-5, 320])
     plt.show()
-#%%
+
 from numpy import savetxt
 savetxt('force.csv', force, delimiter=',')
 savetxt('disp.csv', disp, delimiter=',')
