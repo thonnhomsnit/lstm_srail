@@ -83,6 +83,9 @@ for i in range(81):
     denorm_time  = (pred_result[:,1])*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))+np.amin(data[:32400,5])
    # denorm_time  = (pred_result[:,2])*(np.amax(data[:32400,6])-np.amin(data[:32400,6]))+np.amin(data[:32400,6])
     
+   # denorm_force = (pred_result[:,0]+1)*(np.amax(data[:32400,4])-np.amin(data[:32400,4]))/2+np.amin(data[:32400,4])
+   # denorm_disp  = (pred_result[:,1]+1)*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))/2+np.amin(data[:32400,5])
+   
     #plt.plot(denorm_disp)
     #disp = np.column_stack((disp,denorm_disp))
     #plt.plot(fea_disp[:,i])

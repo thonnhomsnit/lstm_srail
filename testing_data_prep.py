@@ -25,7 +25,7 @@ for i in range(10):
     plt.show()
 #%% cell3
 import tensorflow as tf
-model = tf.keras.models.load_model('model_{}.h5')
+model = tf.keras.models.load_model('lstm_colab.h5')
 model.summary()
 #%% cell4 
 config = pd.read_excel(r'testing_data.xlsx', sheet_name='config')
@@ -43,10 +43,10 @@ for i in range(10):
     L = config[2,i]
     T = config[3,i]
     
-    norm_TR = 2*(TR-1)/(2-1)-1;
-    norm_A = 2*(A-120)/(160-120)-1;
-    norm_L = 2*(L-300)/(500-300)-1;
-    norm_T = 2*(T-2)/(5-2)-1;
+    norm_TR = (TR-1)/(2-1);
+    norm_A = (A-120)/(160-120);
+    norm_L = (L-300)/(500-300);
+    norm_T = (T-2)/(5-2);
     
     norm_TR=float(format(norm_TR,'.2f'))
     norm_A=float(format(norm_A,'.2f'))
@@ -61,7 +61,7 @@ for i in range(10):
     print("N predict: ", N)
 
     # get first time step data
-    test_data = np.array([[-1, -1, -1],[-0.274522, -0.991879, -0.991968]])
+    test_data = np.array([[0, 0, 0],[0, 0, 0.00250627]])
     #test_data = np.array([test_data] * time_step)
     print("test data: ", test_data)
 
@@ -79,12 +79,12 @@ for i in range(10):
 
     pred_result = np.array(pred_result)
 
-    #denorm_force = (pred_result[:,0])*(np.amax(data[:32400,4])-np.amin(data[:32400,4]))+np.amin(data[:32400,4])
-    #denorm_disp  = (pred_result[:,1])*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))+np.amin(data[:32400,5])
+    denorm_force = (pred_result[:,0])*(np.amax(data[:32400,4])-np.amin(data[:32400,4]))+np.amin(data[:32400,4])
+    denorm_disp  = (pred_result[:,1])*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))+np.amin(data[:32400,5])
     #denorm_time  = (pred_result[:,2])*(np.amax(data[:32400,6])-np.amin(data[:32400,6]))+np.amin(data[:32400,6])
     
-    denorm_force = (pred_result[:,0]+1)*(np.amax(data[:32400,4])-np.amin(data[:32400,4]))/2+np.amin(data[:32400,4])
-    denorm_disp  = (pred_result[:,1]+1)*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))/2+np.amin(data[:32400,5])
+    #denorm_force = (pred_result[:,0]+1)*(np.amax(data[:32400,4])-np.amin(data[:32400,4]))/2+np.amin(data[:32400,4])
+    #denorm_disp  = (pred_result[:,1]+1)*(np.amax(data[:32400,5])-np.amin(data[:32400,5]))/2+np.amin(data[:32400,5])
     
     #plt.plot(denorm_disp)
     disp = np.column_stack((disp,denorm_disp))
