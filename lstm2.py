@@ -50,12 +50,11 @@ from keras.layers import LSTM, Dense, Flatten
 
 # Define the model
 model = Sequential()
-model.add(LSTM(50, activation="relu", return_sequences=True, use_bias=True, input_shape=(X_data.shape[1], X_data.shape[2])))
-model.add(LSTM(25, activation="relu"))
-model.add(Flatten())
-model.add(Dense(25))
-model.add(Dense(2))
-model.add(Dense(Y_data.shape[1], activation="relu"))
+model.add(LSTM(48, return_sequences=True, use_bias=True, input_shape=(X_data.shape[1], X_data.shape[2])))
+model.add(LSTM(48, return_sequences=True, use_bias=True, ))
+model.add(LSTM(24))
+model.add(Dense(12, activation="tanh"))
+model.add(Dense(Y_data.shape[1], activation="linear"))
 
 # Compile the model
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
@@ -66,7 +65,7 @@ model.summary()
 # Train the model
 model.fit(X_data, Y_data, epochs=100, verbose=1, batch_size=64)
 #%%
-model.save('lstm_test.h5')
+model.save('lstm_kohar.h5')
 #%%
 result = model.evaluate(X_data, Y_data)
 print("Test MSE loss: ", result)
