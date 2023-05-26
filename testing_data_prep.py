@@ -25,7 +25,7 @@ for i in range(10):
     plt.show()
 #%% cell3
 import tensorflow as tf
-model = tf.keras.models.load_model('lstm_colab.h5')
+model = tf.keras.models.load_model('lstm_force_time_relu.h5')
 model.summary()
 #%% cell4 
 config = pd.read_excel(r'testing_data.xlsx', sheet_name='config')
